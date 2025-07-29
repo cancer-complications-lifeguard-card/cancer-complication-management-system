@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileDashboardLayout, MobileStatsCard } from '@/components/layout/mobile-dashboard-layout';
 import { ResponsiveGrid } from '@/components/ui/responsive-card';
-import { Trees, Search, Book, Activity, AlertTriangle } from 'lucide-react';
+import { Network, Search, Book, Activity, AlertTriangle } from 'lucide-react';
 
 interface KnowledgeGraphClientProps {
   user: User;
@@ -148,7 +148,7 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
           title="风险图谱"
           value={knowledgeStats.totalRiskTrees}
           description="不同癌症类型的风险树"
-          icon={<Trees className="h-5 w-5 text-primary" />}
+          icon={<Network className="h-5 w-5 text-primary" />}
         />
         <MobileStatsCard
           title="查询次数"
