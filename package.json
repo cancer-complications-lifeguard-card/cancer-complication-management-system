@@ -1,4 +1,15 @@
 {
+  "name": "cancer-complication-management-system",
+  "version": "1.0.0",
+  "description": "癌症并发症智能管理系统 - 为癌症患者及家属提供全周期并发症管理支持的智能系统",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cancer-complications-lifeguard-card/cancer-complication-management-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cancer-complications-lifeguard-card/cancer-complication-management-system/issues"
+  },
+  "homepage": "https://github.com/cancer-complications-lifeguard-card/cancer-complication-management-system#readme",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
