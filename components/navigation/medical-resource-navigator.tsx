@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { MapPin, Phone, Clock, Star, Navigation, Filter, Search, ExternalLink } from 'lucide-react';
+import { EmergencyMap } from './emergency-map';
+import { SpecialistDirectory } from './specialist-directory';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -594,16 +596,14 @@ export function MedicalResourceNavigator({ userId, currentLocation }: MedicalRes
         </TabsContent>
 
         <TabsContent value="emergency">
-          {renderEmergencyPanel()}
+          <EmergencyMap 
+            userLocation={userLocation}
+            onLocationUpdate={setUserLocation}
+          />
         </TabsContent>
 
         <TabsContent value="specialists">
-          <div className="text-center py-12">
-            <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">专科医生目录</h3>
-            <p className="text-gray-500">专科医生预约功能正在开发中</p>
-            <p className="text-sm text-gray-400 mt-2">将提供详细的专科医生信息和在线预约功能</p>
-          </div>
+          <SpecialistDirectory userId={userId} />
         </TabsContent>
       </Tabs>
 

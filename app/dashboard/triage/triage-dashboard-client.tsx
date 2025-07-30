@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TriageEngine } from '@/components/triage/triage-engine';
 import { QuickSymptomChecker } from '@/components/triage/quick-symptom-checker';
-import { Stethoscope, History, BarChart3, AlertTriangle, Zap } from 'lucide-react';
+import { MultimodalSymptomChecker } from '@/components/triage/multimodal-symptom-checker';
+import { Stethoscope, History, BarChart3, AlertTriangle, Zap, Brain } from 'lucide-react';
 
 interface TriageDashboardClientProps {
   userId: number;
@@ -16,10 +17,14 @@ export function TriageDashboardClient({ userId }: TriageDashboardClientProps) {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="quick" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
             快速检查
+          </TabsTrigger>
+          <TabsTrigger value="multimodal" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            智能评估
           </TabsTrigger>
           <TabsTrigger value="assessment" className="flex items-center gap-2">
             <Stethoscope className="h-4 w-4" />
@@ -41,6 +46,10 @@ export function TriageDashboardClient({ userId }: TriageDashboardClientProps) {
 
         <TabsContent value="quick">
           <QuickSymptomChecker onCompleteAssessment={() => setActiveTab('assessment')} />
+        </TabsContent>
+
+        <TabsContent value="multimodal">
+          <MultimodalSymptomChecker userId={userId} />
         </TabsContent>
 
         <TabsContent value="assessment">
