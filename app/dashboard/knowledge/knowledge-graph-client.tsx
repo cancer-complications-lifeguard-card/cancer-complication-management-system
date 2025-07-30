@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileDashboardLayout, MobileStatsCard } from '@/components/layout/mobile-dashboard-layout';
 import { ResponsiveGrid } from '@/components/ui/responsive-card';
-import { Network, Search, Book, Activity, AlertTriangle } from 'lucide-react';
+import { Network, Search, Book, Activity, AlertTriangle, Tree } from 'lucide-react';
 
 interface KnowledgeGraphClientProps {
   user: User;

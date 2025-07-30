@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmergencyCardManager } from '@/components/emergency/emergency-card-manager';
+import { MobileEmergencyInterface } from '@/components/emergency/mobile-emergency-interface';
 import { EmergencyCallSystem } from '@/components/emergency/emergency-call-system';
 import { QRCodeScanner } from '@/components/emergency/qr-code-scanner';
 import { EmergencyLocator } from '@/components/emergency/emergency-locator';
 import { MobileDashboardLayout } from '@/components/layout/mobile-dashboard-layout';
-import { CreditCard, Phone, QrCode, MapPin, Shield } from 'lucide-react';
+import { CreditCard, Phone, QrCode, MapPin, Shield, Smartphone } from 'lucide-react';
 
 interface EmergencyDashboardClientProps {
   userId: number;
@@ -42,8 +43,13 @@ export function EmergencyDashboardClient({ userId }: EmergencyDashboardClientPro
         <Shield className="h-6 w-6 text-red-600" />
       }
     >
-      <Tabs defaultValue="card" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+      <Tabs defaultValue="mobile" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+          <TabsTrigger value="mobile" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+            <Smartphone className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">移动急救</span>
+            <span className="sm:hidden">移动</span>
+          </TabsTrigger>
           <TabsTrigger value="card" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
             <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">急救卡管理</span>
@@ -65,6 +71,10 @@ export function EmergencyDashboardClient({ userId }: EmergencyDashboardClientPro
             <span className="sm:hidden">定位</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="mobile">
+          <MobileEmergencyInterface userId={userId} />
+        </TabsContent>
 
         <TabsContent value="card">
           <EmergencyCardManager userId={userId} />

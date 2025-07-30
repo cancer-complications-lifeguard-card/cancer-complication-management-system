@@ -3,21 +3,42 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VitalSignsDashboard } from '@/components/monitoring/vital-signs-dashboard';
 import { RealtimeVitalSignsDashboard } from '@/components/monitoring/realtime-vital-signs-dashboard';
+import { BatteryAwareMonitoring } from '@/components/monitoring/battery-aware-monitoring';
 import { DeviceManager } from '@/components/monitoring/device-manager';
-import { Activity, Settings, TrendingUp, Zap, Radio } from 'lucide-react';
+import { AccessibilityControls, AccessibilityProvider, SimplifiedWrapper } from '@/components/accessibility/simplified-ui';
+import { ProgressiveChart } from '@/components/ui/progressive-chart';
+import { Activity, Settings, TrendingUp, Zap, Radio, Battery, BarChart3 } from 'lucide-react';
 
 interface MonitoringDashboardClientProps {
   userId: number;
 }
 
 export function MonitoringDashboardClient({ userId }: MonitoringDashboardClientProps) {
+  // Sample data for progressive chart
+  const heartRateData = Array.from({ length: 50 }, (_, i) => ({
+    time: `${String(Math.floor(i / 6)).padStart(2, '0')}:${String((i % 6) * 10).padStart(2, '0')}`,
+    value: 70 + Math.sin(i * 0.3) * 10 + Math.random() * 5
+  }));
+
+  const bloodPressureData = Array.from({ length: 30 }, (_, i) => ({
+    time: `${String(Math.floor(i / 3)).padStart(2, '0')}:${String((i % 3) * 20).padStart(2, '0')}`,
+    value: 120 + Math.sin(i * 0.2) * 15 + Math.random() * 8
+  }));
+
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="realtime" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+    <AccessibilityProvider>
+      <SimplifiedWrapper>
+        <div className="space-y-6">
+          <AccessibilityControls />
+          <Tabs defaultValue="realtime" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="realtime" className="flex items-center gap-2">
             <Radio className="h-4 w-4" />
             实时监测
+          </TabsTrigger>
+          <TabsTrigger value="battery" className="flex items-center gap-2">
+            <Battery className="h-4 w-4" />
+            智能优化
           </TabsTrigger>
           <TabsTrigger value="vitals" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
@@ -35,10 +56,18 @@ export function MonitoringDashboardClient({ userId }: MonitoringDashboardClientP
             <Zap className="h-4 w-4" />
             智能预警
           </TabsTrigger>
+          <TabsTrigger value="progressive" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            渐进图表
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="realtime">
           <RealtimeVitalSignsDashboard userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="battery">
+          <BatteryAwareMonitoring userId={userId} />
         </TabsContent>
 
         <TabsContent value="vitals">
@@ -66,7 +95,37 @@ export function MonitoringDashboardClient({ userId }: MonitoringDashboardClientP
             <p className="text-sm text-gray-400 mt-2">将基于您的健康数据提供个性化的风险预警</p>
           </div>
         </TabsContent>
+
+        <TabsContent value="progressive">
+          <div className="grid gap-6">
+            <div className="mobile-card">
+              <ProgressiveChart 
+                data={heartRateData}
+                title="心率监测"
+                unit="bpm"
+                color="#ef4444"
+                height={300}
+                chunkSize={5}
+                loadingDelay={300}
+              />
+            </div>
+            
+            <div className="mobile-card">
+              <ProgressiveChart 
+                data={bloodPressureData}
+                title="血压监测"
+                unit="mmHg"
+                color="#3b82f6"
+                height={250}
+                chunkSize={3}
+                loadingDelay={500}
+              />
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
-    </div>
+        </div>
+      </SimplifiedWrapper>
+    </AccessibilityProvider>
   );
 }
