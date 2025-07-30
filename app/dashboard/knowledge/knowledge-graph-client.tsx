@@ -239,7 +239,7 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
                 </div>
               ) : (
                 <div className="text-center py-12 text-gray-500">
-                  <Tree className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <Trees className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <p>请选择癌症类型以查看风险树</p>
                 </div>
               )}
