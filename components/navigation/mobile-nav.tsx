@@ -15,7 +15,8 @@ import {
   Shield, 
   Database, 
   FlaskRound as Flask,
-  Settings
+  Settings,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -85,6 +86,13 @@ const navigationItems: MobileNavItem[] = [
     href: '/dashboard/drug-interactions',
     icon: Flask,
     description: '药物相互作用检查'
+  },
+  {
+    title: '医院系统集成',
+    href: '/dashboard/hospital',
+    icon: Building2,
+    badge: 'BETA',
+    description: '外部医院系统连接'
   },
   {
     title: '安全监控',

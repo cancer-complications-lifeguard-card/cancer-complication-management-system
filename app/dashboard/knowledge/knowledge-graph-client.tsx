@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileDashboardLayout, MobileStatsCard } from '@/components/layout/mobile-dashboard-layout';
 import { ResponsiveGrid } from '@/components/ui/responsive-card';
-import { Network, Search, Book, Activity, AlertTriangle, Tree } from 'lucide-react';
+import { Network, Search, Book, Activity, AlertTriangle, Trees } from 'lucide-react';
 
 interface KnowledgeGraphClientProps {
   user: User;
@@ -193,7 +193,7 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Tree className="h-5 w-5" />
+                <Trees className="h-5 w-5" />
                 并发症风险树
               </CardTitle>
             </CardHeader>
@@ -233,7 +233,7 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
                 </div>
               ) : selectedCancerType ? (
                 <div className="text-center py-12 text-gray-500">
-                  <Tree className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <Trees className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <p>该癌症类型暂无风险树数据</p>
                   <p className="text-sm mt-2">请选择其他癌症类型或稍后再试</p>
                 </div>
