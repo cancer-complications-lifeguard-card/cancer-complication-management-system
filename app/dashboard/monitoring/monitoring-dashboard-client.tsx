@@ -2,8 +2,9 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { VitalSignsDashboard } from '@/components/monitoring/vital-signs-dashboard';
+import { RealtimeVitalSignsDashboard } from '@/components/monitoring/realtime-vital-signs-dashboard';
 import { DeviceManager } from '@/components/monitoring/device-manager';
-import { Activity, Settings, TrendingUp, Zap } from 'lucide-react';
+import { Activity, Settings, TrendingUp, Zap, Radio } from 'lucide-react';
 
 interface MonitoringDashboardClientProps {
   userId: number;
@@ -12,11 +13,15 @@ interface MonitoringDashboardClientProps {
 export function MonitoringDashboardClient({ userId }: MonitoringDashboardClientProps) {
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="vitals" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="realtime" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="realtime" className="flex items-center gap-2">
+            <Radio className="h-4 w-4" />
+            实时监测
+          </TabsTrigger>
           <TabsTrigger value="vitals" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
-            实时监测
+            历史数据
           </TabsTrigger>
           <TabsTrigger value="devices" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -31,6 +36,10 @@ export function MonitoringDashboardClient({ userId }: MonitoringDashboardClientP
             智能预警
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="realtime">
+          <RealtimeVitalSignsDashboard userId={userId} />
+        </TabsContent>
 
         <TabsContent value="vitals">
           <VitalSignsDashboard userId={userId} />
