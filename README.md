@@ -39,14 +39,14 @@ If you have color style preferences, you can define a new theme in the `contexts
 Use the included setup script to create your `.env` file:
 
 ```bash
-npm db:setup
+npm run db:setup
 ```
 
 Run the database migrations and seed the database with a default user:
 
 ```bash
-npm db:migrate
-npm db:seed
+npm run db:migrate
+npm run db:seed
 ```
 
 This will create the following user and team:

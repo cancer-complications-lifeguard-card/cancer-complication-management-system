@@ -37,7 +37,7 @@ async function runMigrations() {
 async function main() {
   console.log('🚀 Setting up Cancer Complication Management System Database...');
   
-  const POSTGRES_URL = 'postgresql://postgres:LOOWEKHH@127.0.0.1:5432/cancer_management';
+  const POSTGRES_URL = 'postgresql://management:Test123@127.0.0.1:5432/cancer_management';
   const BASE_URL = 'http://localhost:3000';
   const AUTH_SECRET = generateAuthSecret();
 
