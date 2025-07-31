@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { HospitalIntegrationDashboard } from './hospital-integration-client';
-import { getUserSession } from '@/lib/auth/session';
+import { getSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default async function HospitalIntegrationPage() {
-  const userSession = await getUserSession();
+  const session = await getSession();
   
-  if (!userSession) {
+  if (!session) {
     redirect('/auth/signin');
   }
 
-  return <HospitalIntegrationDashboard user={userSession.user} />;
+  return <HospitalIntegrationDashboard user={session.user} />;
 }

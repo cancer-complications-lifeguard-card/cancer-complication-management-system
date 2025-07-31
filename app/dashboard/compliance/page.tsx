@@ -1,13 +1,13 @@
-import { getUser } from '@/lib/auth/session';
+import { getSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { ComplianceClient } from './compliance-client';
 
 export default async function CompliancePage() {
-  const user = await getUser();
+  const session = await getSession();
   
-  if (!user) {
+  if (!session) {
     redirect('/sign-in');
   }
 
-  return <ComplianceClient user={user} />;
+  return <ComplianceClient user={session.user} />;
 }

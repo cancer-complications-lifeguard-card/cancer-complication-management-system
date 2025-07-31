@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { 
   Database, 
-  Sync, 
+  RefreshCw, 
   AlertTriangle, 
   Clock, 
   Activity,
@@ -159,7 +159,7 @@ export function EHRManagementDashboard() {
           </p>
         </div>
         <Button onClick={loadEHRData} disabled={loading}>
-          <Sync className="h-4 w-4 mr-2" />
+          <RefreshCw className="h-4 w-4 mr-2" />
           刷新
         </Button>
       </div>

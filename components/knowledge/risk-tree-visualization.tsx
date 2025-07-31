@@ -1,19 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import ReactFlow, {
-  Node,
-  Edge,
-  addEdge,
-  Connection,
-  useNodesState,
-  useEdgesState,
-  Controls,
-  Background,
-  BackgroundVariant,
-  Panel,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import { useCallback, useState } from 'react';
 
 import { ComplicationRiskTree, RiskLevel } from '@/lib/db/schema';
 import { Badge } from '@/components/ui/badge';
@@ -27,14 +14,16 @@ interface RiskTreeVisualizationProps {
   selectedNodeId?: number;
 }
 
-interface RiskTreeNode extends Node {
-  data: ComplicationRiskTree & {
-    onClick: (node: ComplicationRiskTree) => void;
-  };
+// Simplified interface without ReactFlow dependencies
+
+// Simple risk node component
+interface SimpleRiskNodeProps {
+  node: ComplicationRiskTree;
+  onClick: (node: ComplicationRiskTree) => void;
+  isSelected?: boolean;
 }
 
-// Custom node component
-const RiskNode = ({ data }: { data: RiskTreeNode['data'] }) => {
+const SimpleRiskNode = ({ node, onClick, isSelected }: SimpleRiskNodeProps) => {
   const getRiskConfig = (riskLevel: string) => {
     switch (riskLevel) {
       case RiskLevel.CRITICAL:
@@ -70,41 +59,43 @@ const RiskNode = ({ data }: { data: RiskTreeNode['data'] }) => {
     }
   };
 
-  const config = getRiskConfig(data.riskLevel);
+  const config = getRiskConfig(node.riskLevel);
 
   return (
     <Card 
-      className={`cursor-pointer transition-all hover:shadow-lg border-2 ${config.color} min-w-64 max-w-80`}
-      onClick={() => data.onClick(data)}
+      className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
+        isSelected ? 'ring-2 ring-blue-500' : ''
+      } ${config.color} w-full max-w-sm`}
+      onClick={() => onClick(node)}
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           {config.icon}
-          <span className="line-clamp-2">{data.complicationName}</span>
+          <span className="line-clamp-2">{node.complicationName}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Badge variant={config.badgeVariant} className="text-xs">
-              {data.riskLevel.toUpperCase()}风险
+              {node.riskLevel.toUpperCase()}风险
             </Badge>
-            {data.probability && (
+            {node.probability && (
               <span className="text-xs text-muted-foreground">
-                概率: {data.probability}
+                概率: {node.probability}
               </span>
             )}
           </div>
           
-          {data.timeframe && (
+          {node.timeframe && (
             <div className="text-xs text-muted-foreground">
-              时间: {data.timeframe}
+              时间: {node.timeframe}
             </div>
           )}
           
-          {data.description && (
+          {node.description && (
             <div className="text-xs text-muted-foreground line-clamp-3">
-              {data.description}
+              {node.description}
             </div>
           )}
         </div>
@@ -113,13 +104,7 @@ const RiskNode = ({ data }: { data: RiskTreeNode['data'] }) => {
   );
 };
 
-const nodeTypes = {
-  riskNode: RiskNode,
-};
-
 export function RiskTreeVisualization({ riskTree, onNodeClick, selectedNodeId }: RiskTreeVisualizationProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<RiskTreeNode>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<ComplicationRiskTree | null>(null);
 
   const handleNodeClick = useCallback((node: ComplicationRiskTree) => {
@@ -127,168 +112,135 @@ export function RiskTreeVisualization({ riskTree, onNodeClick, selectedNodeId }:
     onNodeClick?.(node);
   }, [onNodeClick]);
 
-  const convertTreeToNodesAndEdges = useCallback((tree: ComplicationRiskTree[]) => {
-    const nodes: RiskTreeNode[] = [];
-    const edges: Edge[] = [];
-    const nodeMap = new Map<number, ComplicationRiskTree>();
+  // Group nodes by risk level for better organization
+  const groupedNodes = {
+    [RiskLevel.CRITICAL]: riskTree.filter(node => node.riskLevel === RiskLevel.CRITICAL),
+    [RiskLevel.HIGH]: riskTree.filter(node => node.riskLevel === RiskLevel.HIGH),
+    [RiskLevel.MEDIUM]: riskTree.filter(node => node.riskLevel === RiskLevel.MEDIUM),
+    [RiskLevel.LOW]: riskTree.filter(node => node.riskLevel === RiskLevel.LOW),
+  };
 
-    // First pass: create a map of all nodes
-    const collectNodes = (items: ComplicationRiskTree[]) => {
-      items.forEach(item => {
-        nodeMap.set(item.id, item);
-        if ((item as any).children) {
-          collectNodes((item as any).children);
-        }
-      });
-    };
-    collectNodes(tree);
-
-    // Second pass: create React Flow nodes and edges
-    let yPosition = 0;
-    const levelWidth = 400;
-    const levelHeight = 200;
-    const nodeWidth = 280;
-
-    const processLevel = (items: ComplicationRiskTree[], level: number, parentX = 0) => {
-      const itemsPerRow = Math.max(1, Math.ceil(Math.sqrt(items.length)));
-      const totalWidth = itemsPerRow * levelWidth;
-      const startX = parentX - totalWidth / 2;
-
-      items.forEach((item, index) => {
-        const row = Math.floor(index / itemsPerRow);
-        const col = index % itemsPerRow;
-        const x = startX + col * levelWidth + levelWidth / 2;
-        const y = level * levelHeight + row * 100;
-
-        nodes.push({
-          id: item.id.toString(),
-          type: 'riskNode',
-          position: { x, y },
-          data: {
-            ...item,
-            onClick: handleNodeClick,
-          },
-          selected: selectedNodeId === item.id,
-        });
-
-        // Create edges to children
-        if ((item as any).children) {
-          (item as any).children.forEach((child: ComplicationRiskTree) => {
-            edges.push({
-              id: `${item.id}-${child.id}`,
-              source: item.id.toString(),
-              target: child.id.toString(),
-              type: 'smoothstep',
-              animated: child.riskLevel === RiskLevel.CRITICAL,
-              style: { 
-                stroke: child.riskLevel === RiskLevel.CRITICAL ? '#ef4444' : 
-                        child.riskLevel === RiskLevel.HIGH ? '#f97316' :
-                        child.riskLevel === RiskLevel.MEDIUM ? '#eab308' : '#10b981',
-                strokeWidth: 2,
-              },
-            });
-          });
-          processLevel((item as any).children, level + 1, x);
-        }
-      });
-    };
-
-    processLevel(tree, 0);
-
-    return { nodes, edges };
-  }, [handleNodeClick, selectedNodeId]);
-
-  useEffect(() => {
-    const { nodes: newNodes, edges: newEdges } = convertTreeToNodesAndEdges(riskTree);
-    setNodes(newNodes);
-    setEdges(newEdges);
-  }, [riskTree, convertTreeToNodesAndEdges]);
-
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  if (riskTree.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-gray-500">
+        <div className="text-center">
+          <Info className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+          <p>暂无风险数据</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full relative">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.1}
-        maxZoom={1.5}
-      >
-        <Controls />
-        <Background variant={BackgroundVariant.Dots} />
-        
-        <Panel position="top-right" className="bg-white p-4 rounded-lg shadow-lg">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-sm">风险等级图例</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-red-600" />
-                <span>危急</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3 text-orange-600" />
-                <span>高风险</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Info className="w-3 h-3 text-yellow-600" />
-                <span>中风险</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Shield className="w-3 h-3 text-green-600" />
-                <span>低风险</span>
-              </div>
-            </div>
+    <div className="w-full h-full p-4 overflow-auto">
+      {/* Legend */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h3 className="font-semibold text-sm mb-3">风险等级图例</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-red-600" />
+            <span>危急风险</span>
+            <span className="text-gray-500">({groupedNodes[RiskLevel.CRITICAL].length})</span>
           </div>
-        </Panel>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-orange-600" />
+            <span>高风险</span>
+            <span className="text-gray-500">({groupedNodes[RiskLevel.HIGH].length})</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4 text-yellow-600" />
+            <span>中风险</span>
+            <span className="text-gray-500">({groupedNodes[RiskLevel.MEDIUM].length})</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-green-600" />
+            <span>低风险</span>
+            <span className="text-gray-500">({groupedNodes[RiskLevel.LOW].length})</span>
+          </div>
+        </div>
+      </div>
 
-        {selectedNode && (
-          <Panel position="bottom-left" className="bg-white p-4 rounded-lg shadow-lg max-w-md">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">{selectedNode.complicationName}</h3>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedNode(null)}>
-                  ×
-                </Button>
+      {/* Risk nodes organized by level */}
+      <div className="space-y-6">
+        {Object.entries(groupedNodes).map(([level, nodes]) => {
+          if (nodes.length === 0) return null;
+          
+          const levelLabels = {
+            [RiskLevel.CRITICAL]: '危急风险',
+            [RiskLevel.HIGH]: '高风险', 
+            [RiskLevel.MEDIUM]: '中风险',
+            [RiskLevel.LOW]: '低风险',
+          };
+
+          return (
+            <div key={level}>
+              <h4 className="font-medium text-lg mb-3 text-gray-800">
+                {levelLabels[level as RiskLevel]} ({nodes.length})
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {nodes.map((node) => (
+                  <SimpleRiskNode
+                    key={node.id}
+                    node={node}
+                    onClick={handleNodeClick}
+                    isSelected={selectedNodeId === node.id}
+                  />
+                ))}
               </div>
-              
-              {selectedNode.description && (
-                <p className="text-sm text-gray-600">{selectedNode.description}</p>
-              )}
-              
-              {selectedNode.symptoms && Array.isArray(selectedNode.symptoms) && (
-                <div>
-                  <h4 className="font-medium text-sm">主要症状:</h4>
-                  <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
-                    {(selectedNode.symptoms as string[]).map((symptom, index) => (
-                      <li key={index}>{symptom}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              {selectedNode.preventionMeasures && Array.isArray(selectedNode.preventionMeasures) && (
-                <div>
-                  <h4 className="font-medium text-sm">预防措施:</h4>
-                  <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
-                    {(selectedNode.preventionMeasures as string[]).map((measure, index) => (
-                      <li key={index}>{measure}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
-          </Panel>
-        )}
-      </ReactFlow>
+          );
+        })}
+      </div>
+
+      {/* Selected node details */}
+      {selectedNode && (
+        <div className="mt-8 p-6 bg-white border rounded-lg shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">{selectedNode.complicationName}</h3>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedNode(null)}>
+              ×
+            </Button>
+          </div>
+          
+          {selectedNode.description && (
+            <p className="text-sm text-gray-600 mb-4">{selectedNode.description}</p>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedNode.symptoms && Array.isArray(selectedNode.symptoms) && (
+              <div>
+                <h4 className="font-medium text-sm mb-2">主要症状:</h4>
+                <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
+                  {(selectedNode.symptoms as string[]).map((symptom, index) => (
+                    <li key={index}>{symptom}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {selectedNode.preventionMeasures && Array.isArray(selectedNode.preventionMeasures) && (
+              <div>
+                <h4 className="font-medium text-sm mb-2">预防措施:</h4>
+                <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
+                  {(selectedNode.preventionMeasures as string[]).map((measure, index) => (
+                    <li key={index}>{measure}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+            <span>风险等级: {selectedNode.riskLevel}</span>
+            {selectedNode.probability && (
+              <span>概率: {selectedNode.probability}</span>
+            )}
+            {selectedNode.timeframe && (
+              <span>时间范围: {selectedNode.timeframe}</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
