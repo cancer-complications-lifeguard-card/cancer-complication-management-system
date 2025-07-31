@@ -3,14 +3,19 @@
 import { useCallback, useState } from 'react';
 
 import { ComplicationRiskTree, RiskLevel } from '@/lib/db/schema';
+
+type EnhancedComplicationRiskTree = ComplicationRiskTree & {
+  symptoms?: string[];
+  preventionMeasures?: string[];
+};
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Info, Shield, Zap } from 'lucide-react';
 
 interface RiskTreeVisualizationProps {
-  riskTree: ComplicationRiskTree[];
-  onNodeClick?: (node: ComplicationRiskTree) => void;
+  riskTree: EnhancedComplicationRiskTree[];
+  onNodeClick?: (node: EnhancedComplicationRiskTree) => void;
   selectedNodeId?: number;
 }
 
@@ -18,8 +23,8 @@ interface RiskTreeVisualizationProps {
 
 // Simple risk node component
 interface SimpleRiskNodeProps {
-  node: ComplicationRiskTree;
-  onClick: (node: ComplicationRiskTree) => void;
+  node: EnhancedComplicationRiskTree;
+  onClick: (node: EnhancedComplicationRiskTree) => void;
   isSelected?: boolean;
 }
 
@@ -105,9 +110,9 @@ const SimpleRiskNode = ({ node, onClick, isSelected }: SimpleRiskNodeProps) => {
 };
 
 export function RiskTreeVisualization({ riskTree, onNodeClick, selectedNodeId }: RiskTreeVisualizationProps) {
-  const [selectedNode, setSelectedNode] = useState<ComplicationRiskTree | null>(null);
+  const [selectedNode, setSelectedNode] = useState<EnhancedComplicationRiskTree | null>(null);
 
-  const handleNodeClick = useCallback((node: ComplicationRiskTree) => {
+  const handleNodeClick = useCallback((node: EnhancedComplicationRiskTree) => {
     setSelectedNode(node);
     onNodeClick?.(node);
   }, [onNodeClick]);
@@ -207,23 +212,23 @@ export function RiskTreeVisualization({ riskTree, onNodeClick, selectedNodeId }:
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {selectedNode.symptoms && Array.isArray(selectedNode.symptoms) && (
+            {selectedNode?.symptoms && Array.isArray(selectedNode.symptoms) && selectedNode.symptoms.length > 0 && (
               <div>
                 <h4 className="font-medium text-sm mb-2">主要症状:</h4>
                 <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
-                  {(selectedNode.symptoms as string[]).map((symptom, index) => (
-                    <li key={index}>{symptom}</li>
+                  {selectedNode.symptoms.map((symptom, index) => (
+                    <li key={`symptom-${index}`}>{symptom}</li>
                   ))}
                 </ul>
               </div>
             )}
             
-            {selectedNode.preventionMeasures && Array.isArray(selectedNode.preventionMeasures) && (
+            {selectedNode?.preventionMeasures && Array.isArray(selectedNode.preventionMeasures) && selectedNode.preventionMeasures.length > 0 && (
               <div>
                 <h4 className="font-medium text-sm mb-2">预防措施:</h4>
                 <ul className="text-xs list-disc list-inside space-y-1 text-gray-600">
                   {(selectedNode.preventionMeasures as string[]).map((measure, index) => (
-                    <li key={index}>{measure}</li>
+                    <li key={`measure-${index}`}>{measure}</li>
                   ))}
                 </ul>
               </div>

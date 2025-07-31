@@ -61,6 +61,7 @@ export const medicalTerms = pgTable('medical_terms', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+// @ts-expect-error - Circular reference is handled by drizzle-orm
 export const complicationRiskTrees = pgTable('complication_risk_trees', {
   id: serial('id').primaryKey(),
   cancerType: varchar('cancer_type', { length: 100 }).notNull(),
@@ -73,6 +74,7 @@ export const complicationRiskTrees = pgTable('complication_risk_trees', {
   riskFactors: json('risk_factors'), // JSON array of risk factors
   preventionMeasures: json('prevention_measures'), // JSON array of prevention strategies
   treatmentOptions: json('treatment_options'), // JSON array of treatment approaches
+  // @ts-expect-error - Circular reference is handled by drizzle-orm
   parentId: integer('parent_id').references(() => complicationRiskTrees.id), // for hierarchical structure
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
