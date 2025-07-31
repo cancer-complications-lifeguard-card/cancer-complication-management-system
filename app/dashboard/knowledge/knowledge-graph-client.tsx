@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileDashboardLayout, MobileStatsCard } from '@/components/layout/mobile-dashboard-layout';
 import { ResponsiveGrid } from '@/components/ui/responsive-card';
-import { Network, Search, Book, Activity, AlertTriangle, Trees } from 'lucide-react';
+import { Network, Search, Book, Activity, AlertTriangle } from 'lucide-react';
 
 interface KnowledgeGraphClientProps {
   user: User;
@@ -151,49 +151,67 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
           icon={<Network className="h-5 w-5 text-primary" />}
         />
         <MobileStatsCard
-          title="查询次数"
+          title="用户互动"
           value={knowledgeStats.userInteractions}
-          description="您的知识库使用记录"
+          description="本月查询次数"
           icon={<Activity className="h-5 w-5 text-primary" />}
         />
         <MobileStatsCard
-          title="风险评估"
-          value={24}
-          description="个人风险因子识别"
+          title="实时提醒"
+          value={user.stage === 'onset' ? 12 : 3}
+          description="活跃预警信息"
           icon={<AlertTriangle className="h-5 w-5 text-primary" />}
         />
       </ResponsiveGrid>
 
-      {/* Main Content */}
+      {/* Main Content Tabs */}
       <Tabs defaultValue="terms" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto sm:h-10">
-          <TabsTrigger value="terms" className="text-sm sm:text-base p-2 sm:p-4">医疗术语百科</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="terms" className="text-sm sm:text-base p-2 sm:p-4">医疗术语</TabsTrigger>
           <TabsTrigger value="risk-tree" className="text-sm sm:text-base p-2 sm:p-4">并发症风险树</TabsTrigger>
           <TabsTrigger value="search" className="text-sm sm:text-base p-2 sm:p-4">综合搜索</TabsTrigger>
         </TabsList>
 
+        {/* Medical Terms Browser */}
         <TabsContent value="terms" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Book className="h-5 w-5" />
-                医疗术语百科
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MedicalTermsBrowser 
-                onTermSelect={handleTermSelect}
-                showCategories={true}
-              />
-            </CardContent>
-          </Card>
+          <MedicalTermsBrowser 
+            onTermSelect={handleTermSelect}
+            selectedTerm={selectedTerm}
+          />
+          
+          {/* Selected Term Detail */}
+          {selectedTerm && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Book className="h-5 w-5" />
+                  术语详情
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedTerm.term}</h3>
+                  <Badge variant="outline" className="mt-1">{selectedTerm.category}</Badge>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">定义</h4>
+                  <p className="text-gray-600">{selectedTerm.definition}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">详细描述</h4>
+                  <p className="text-gray-600">{selectedTerm.description}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
+        {/* Risk Tree Visualization */}
         <TabsContent value="risk-tree" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Trees className="h-5 w-5" />
+                <Network className="h-5 w-5" />
                 并发症风险树
               </CardTitle>
             </CardHeader>
@@ -233,13 +251,13 @@ export function KnowledgeGraphClient({ user }: KnowledgeGraphClientProps) {
                 </div>
               ) : selectedCancerType ? (
                 <div className="text-center py-12 text-gray-500">
-                  <Trees className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <Network className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <p>该癌症类型暂无风险树数据</p>
                   <p className="text-sm mt-2">请选择其他癌症类型或稍后再试</p>
                 </div>
               ) : (
                 <div className="text-center py-12 text-gray-500">
-                  <Trees className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <Network className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                   <p>请选择癌症类型以查看风险树</p>
                 </div>
               )}

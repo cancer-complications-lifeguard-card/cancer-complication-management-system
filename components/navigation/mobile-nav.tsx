@@ -16,7 +16,8 @@ import {
   Database, 
   FlaskRound as Flask,
   Settings,
-  Building2
+  Building2,
+  CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -99,6 +100,13 @@ const navigationItems: MobileNavItem[] = [
     href: '/dashboard/security',
     icon: Settings,
     description: '隐私和安全设置'
+  },
+  {
+    title: '合规管理',
+    href: '/dashboard/compliance',
+    icon: CheckCircle,
+    badge: 'NEW',
+    description: '医疗AI合规标准'
   }
 ];
 

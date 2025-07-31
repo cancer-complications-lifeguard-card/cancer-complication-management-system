@@ -4,8 +4,9 @@ import { User } from '@/lib/db/schema';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { HospitalSystemManager } from '@/components/hospital/hospital-system-manager';
 import { PatientRecordSync } from '@/components/hospital/patient-record-sync';
+import { EHRManagementDashboard } from '@/components/hospital/ehr-management-dashboard';
 import { AccessibilityProvider, SimplifiedWrapper } from '@/components/accessibility/simplified-ui';
-import { Hospital, Database, Users, Settings, Activity, Wifi } from 'lucide-react';
+import { Hospital, Database, Users, Settings, Activity, Wifi, FileHeart } from 'lucide-react';
 
 interface HospitalIntegrationDashboardProps {
   user: User;
@@ -26,7 +27,7 @@ export function HospitalIntegrationDashboard({ user }: HospitalIntegrationDashbo
           </div>
 
           <Tabs defaultValue="systems" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="systems" className="flex items-center gap-2">
                 <Hospital className="h-4 w-4" />
                 系统管理
@@ -34,6 +35,10 @@ export function HospitalIntegrationDashboard({ user }: HospitalIntegrationDashbo
               <TabsTrigger value="patients" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 患者同步
+              </TabsTrigger>
+              <TabsTrigger value="ehr" className="flex items-center gap-2">
+                <FileHeart className="h-4 w-4" />
+                EHR集成
               </TabsTrigger>
               <TabsTrigger value="connections" className="flex items-center gap-2">
                 <Wifi className="h-4 w-4" />
@@ -59,6 +64,10 @@ export function HospitalIntegrationDashboard({ user }: HospitalIntegrationDashbo
 
             <TabsContent value="patients">
               <PatientRecordSync />
+            </TabsContent>
+
+            <TabsContent value="ehr">
+              <EHRManagementDashboard />
             </TabsContent>
 
             <TabsContent value="connections">
