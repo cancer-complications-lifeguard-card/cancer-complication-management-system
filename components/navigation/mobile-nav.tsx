@@ -43,8 +43,7 @@ const navigationItems: MobileNavItem[] = [
     title: '知识图谱',
     href: '/dashboard/knowledge',
     icon: BookOpen,
-    badge: '维护中',
-    description: '功能升级中，敬请期待'
+    description: '医疗术语百科和并发症风险树'
   },
   {
     title: '健康档案',
