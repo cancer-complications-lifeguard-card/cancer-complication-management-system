@@ -20,7 +20,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -43,7 +43,8 @@ const navigationItems: MobileNavItem[] = [
     title: '知识图谱',
     href: '/dashboard/knowledge',
     icon: BookOpen,
-    description: '医疗术语和风险树'
+    badge: '维护中',
+    description: '功能升级中，敬请期待'
   },
   {
     title: '健康档案',
@@ -132,7 +133,7 @@ export default function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="w-80 px-0">
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">功能导航</h2>
+          <SheetTitle className="text-lg font-semibold">功能导航</SheetTitle>
           <Button
             variant="ghost"
             size="sm"
